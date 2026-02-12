@@ -1,42 +1,28 @@
 package com.sharon.libraryapi.service;
 
 import com.sharon.libraryapi.model.Book;
-import com.sharon.libraryapi.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class BookService {
 
-    private final BookRepository bookRepository;
+    private final List<Book> books = new ArrayList<>();
+    private final AtomicLong idCounter = new AtomicLong();
 
-    public BookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
-
-    public Book createBook(Book book) {
-        return bookRepository.save(book);
-    }
-
+    // Get all books
     public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+        return books;
     }
 
-    public Book getBook(Long id) {
-        return bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found: " + id));
+    // Add a book
+    public Book addBook(Book book) {
+        book.setId(idCounter.incrementAndGet());
+        books.add(book);
+        return book;
     }
 
-    public Book updateBook(Long id, Book updatedBook) {
-        Book book = getBook(id);
-        book.setTitle(updatedBook.getTitle());
-        book.setAuthor(updatedBook.getAuthor());
-        return bookRepository.save(book);
-    }
-
-    public void deleteBook(Long id) {
-        Book book = getBook(id);
-        bookRepository.delete(book);
-    }
 }
